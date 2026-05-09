@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+<feature name="org.gnu.gdb.p16.core">
+
+    <reg name="r0" bitsize="16" type="uint16"/>
+    <reg name="r1" bitsize="16" type="uint16"/>
+    <reg name="r2" bitsize="16" type="uint16"/>
+    <reg name="r3" bitsize="16" type="uint16"/>
+    <reg name="r4" bitsize="16" type="uint16"/>
+    <reg name="r5" bitsize="16" type="uint16"/>
+    <reg name="r6" bitsize="16" type="uint16"/>
+    <reg name="r7" bitsize="16" type="uint16"/>
+    <reg name="r8" bitsize="16" type="uint16"/>
+    <reg name="r9" bitsize="16" type="uint16"/>
+    <reg name="r10" bitsize="16" type="uint16"/>
+    <reg name="r11" bitsize="16" type="uint16"/>
+    <reg name="r12" bitsize="16" type="uint16"/>
+
+    <reg name="sp" bitsize="16" type="data_ptr"/>
+    <reg name="lr" bitsize="16" type="uint16"/>
+    <reg name="pc" bitsize="16" type="code_ptr"/>
+
+    <flags id="p16_cpsr_flags" size="2">
+        <field name="Z" start="0" end="0"/>
+        <field name="C" start="1" end="1"/>
+        <field name="V" start="2" end="2"/>
+        <field name="N" start="3" end="3"/>
+        <field name="I" start="4" end="4"/>
+        <field name="M" start="5" end="5"/>
+    </flags>
+
+    <reg name="cpsr" bitsize="16" type="p16_cpsr_flags"/>
+    <reg name="ilr" bitsize="16" type="uint16"/>
+    <reg name="spsr" bitsize="16" type="p16_cpsr_flags"/>
+
+</feature>
