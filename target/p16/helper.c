@@ -19,12 +19,14 @@
 #include "qemu/osdep.h"
 #include "cpu.h"
 #include "accel/tcg/cpu-ops.h"
+#include "exec/cpu-interrupt.h"
 #include "exec/cputlb.h"
 #include "exec/page-protection.h"
 #include "exec/target_page.h"
 #include "accel/tcg/cpu-ldst.h"
 #include "exec/helper-proto.h"
 #include "qemu/plugin.h"
+
 /**
  * p16_cpu_exec_interrupt:
  * @cs: Generic CPU state.
