@@ -1,0 +1,115 @@
+#
+# P16 instruction decode definitions.
+#
+# Copyright (c) 2025-2026 Rafael Romão
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
+#
+
+%rd 0:4
+%rn 4:3
+%rm 7:4
+%imm3 7:3
+%imm4 7:4
+%imm4_a 7:3 !function=mult_2
+%imm7 4:6 !function=mult_2
+%imm8 4:8
+%offset 0:s10 !function=mult_2
+
+
+&rm_rn_rd rd rn rm
+&rm_rd rd rm
+&rn_rm rm rn
+&rn_rd rd rn
+&rd rd
+&rm rm
+&imm3_rn_rd rd rn imm3
+&imm4_rn_rd rd rn imm4
+&imm7_rd rd imm7
+&imm8_rd rd imm8
+&offset offset
+
+@op_rm_rn_rd     .... .... .... ....         &rm_rn_rd      rd=%rd rn=%rn rm=%rm
+@op_offset       .... .... .... ....         &offset        offset=%offset
+@op_rm           .... .... .... ....         &rm            rm=%rm
+@op_rm_rn        .... .... .... ....         &rn_rm         rm=%rm rn=%rn
+@op_rm_rd        .... .... .... ....         &rm_rd         rd=%rd rm=%rm
+@op_rn_rd        .... .... .... ....         &rn_rd         rd=%rd rn=%rn
+@op_rd           .... .... .... ....         &rd            rd=%rd
+@op_imm3_rn_rd   .... .... .... ....         &imm3_rn_rd    rd=%rd rn=%rn imm3=%imm3
+@op_imm4_rn_rd   .... .... .... ....         &imm4_rn_rd    rd=%rd rn=%rn imm4=%imm4
+@op_imm4a_rn_rd  .... .... .... ....         &imm4_rn_rd    rd=%rd rn=%rn imm4=%imm4_a
+@op_imm7_rd      .... .... .... ....         &imm7_rd       rd=%rd imm7=%imm7
+@op_imm8_rd      .... .... .... ....         &imm8_rd       rd=%rd imm8=%imm8
+
+
+
+#
+# Logic And Arithmetic Instructions
+#
+
+ADC             1001 0 .. ..... ....        @op_rm_rn_rd
+ADD_I           1010 0 .. ..... ....        @op_imm4_rn_rd
+ADD             1000 0 .. ..... ....        @op_rm_rn_rd
+AND             1100 0 .. ..... ....        @op_rm_rn_rd
+ASR             1111 0 .. ..... ....        @op_imm4_rn_rd
+CMP             1011 1 .. ..... ----        @op_rm_rn
+EOR             1101 0 .. ..... ....        @op_rm_rn_rd
+LSL             1110 0 .. ..... ....        @op_imm4_rn_rd
+LSR             1110 1 .. ..... ....        @op_imm4_rn_rd
+ORR             1100 1 .. ..... ....        @op_rm_rn_rd
+ROR             1111 1 .. ..... ....        @op_imm4_rn_rd
+RRX             1101 1 -- --... ....        @op_rn_rd
+SUB_I           1010 1 .. ..... ....        @op_imm4_rn_rd
+SUB             1000 1 .. ..... ....        @op_rm_rn_rd
+SBC             1001 1 .. ..... ....        @op_rm_rn_rd
+
+#
+# Branch Instructions
+#
+
+B               0101 10 . ..... ....        @op_offset
+BLO             0100 11 . ..... ....        @op_offset
+BHS             0100 10 . ..... ....        @op_offset
+BGE             0101 00 . ..... ....        @op_offset
+BL              0101 11 . ..... ....        @op_offset
+BLT             0101 01 . ..... ....        @op_offset
+BZC             0100 01 . ..... ....        @op_offset
+BZS             0100 00 . ..... ....        @op_offset
+
+#
+# Data Transfer Instructions
+#
+
+LDR_L           0000 11 . ..... ....        @op_imm7_rd
+LDR_C           0000 00 . ..... ....        @op_imm4a_rn_rd
+LDR_R           0001 0 .. ..... ....        @op_rm_rn_rd
+LDRB_C          0000 10 . ..... ....        @op_imm3_rn_rd
+LDRB_R          0001 1 .. ..... ....        @op_rm_rn_rd
+POP             0000 01 - ----- ....        @op_rd
+PUSH            0010 01 - ----- ....        @op_rd
+STR_C           0010 00 . ..... ....        @op_imm4a_rn_rd
+STR_R           0011 0 .. ..... ....        @op_rm_rn_rd
+STRB_C          0010 10 . ..... ....        @op_imm3_rn_rd
+STRB_R          0011 1 .. ..... ....        @op_rm_rn_rd
+
+MOV_I           0110 ...  ..... ....        @op_imm8_rd
+MOV             1011 0 .. .. 000 ....       @op_rm_rd
+MOVS            1011 0 -- -- 010 ----
+MOVT            0111 ...  ..... ....        @op_imm8_rd
+MRS_C           1011 0 -- -- 110 ....       @op_rd
+MRS_S           1011 0 -- -- 111 ....       @op_rd
+MSR_C           1011 0 .. .. 100 ----       @op_rm
+MSR_S           1011 0 .. .. 101 ----       @op_rm
+MVN             1011 0 .. .. 001 ....       @op_rm_rd
