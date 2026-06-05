@@ -1,0 +1,11 @@
+config P16_BOARD
+    bool
+    default y
+    depends on P16
+    select P16_MEM
+config P16_MEM
+    bool
+    default y
+config P16_FDT
+    bool
+    default y

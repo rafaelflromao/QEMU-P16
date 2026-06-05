@@ -20,6 +20,7 @@ subdir('sparc')
 subdir('sparc64')
 subdir('tricore')
 subdir('xtensa')
+subdir('p16')
 
 subdir('9pfs')
 subdir('acpi')

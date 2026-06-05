@@ -69,6 +69,7 @@ source sparc/Kconfig
 source sparc64/Kconfig
 source tricore/Kconfig
 source xtensa/Kconfig
+source p16/Kconfig
 
 # Symbols used by multiple targets
 config TEST_DEVICES
