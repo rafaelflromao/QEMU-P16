@@ -3267,6 +3267,7 @@ disassemblers = {
   'sparc' : ['CONFIG_SPARC_DIS'],
   'xtensa' : ['CONFIG_XTENSA_DIS'],
   'loongarch' : ['CONFIG_LOONGARCH_DIS'],
+  'p16' : ['CONFIG_P16_DIS'],
 }
 
 have_ivshmem = config_host_data.get('CONFIG_EVENTFD')
