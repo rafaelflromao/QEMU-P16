@@ -357,7 +357,8 @@ typedef enum {
  *
  * Generic emitter for logical instructions (AND, OR, XOR).
  */
-static inline void gen_logic_op(DisasContext *ctx, TCGv_i32 t0, TCGv_i32 t1, TCGv_i32 res, const LogicOperation op) {
+static inline void gen_logic_op(DisasContext *ctx, TCGv_i32 t0, TCGv_i32 t1, const uint32_t rd, const LogicOperation op) {
+    TCGv res = tcg_temp_new_i32();
     switch (op) {
         case LOGIC_AND:
             tcg_gen_and_i32(res, t0, t1);
@@ -372,26 +373,21 @@ static inline void gen_logic_op(DisasContext *ctx, TCGv_i32 t0, TCGv_i32 t1, TCG
 
     tcg_gen_ext16u_i32(res, res);
     calc_cond_z_n(res);
+    store_reg(ctx, rd, res);
 }
 
 static bool trans_AND(DisasContext *ctx, arg_AND *a) {
-    TCGv res = tcg_temp_new_i32();
-    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), res, LOGIC_AND);
-    store_reg(ctx, a->rd, res);
+    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), a->rd, LOGIC_AND);
     return true;
 }
 
 static bool trans_EOR(DisasContext *ctx, arg_EOR *a) {
-    TCGv res = tcg_temp_new_i32();
-    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), res, LOGIC_XOR);
-    store_reg(ctx, a->rd, res);
+    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), a->rd, LOGIC_XOR);
     return true;
 }
 
 static bool trans_ORR(DisasContext *ctx, arg_ORR *a) {
-    TCGv res = tcg_temp_new_i32();
-    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), res, LOGIC_OR);
-    store_reg(ctx, a->rd, res);
+    gen_logic_op(ctx, load_reg(ctx, a->rn), load_reg(ctx, a->rm), a->rd, LOGIC_OR);
     return true;
 }
 
@@ -551,9 +547,7 @@ static bool trans_MOVT(DisasContext *ctx, arg_MOVT *a) {
 }
 
 static bool trans_MVN(DisasContext *ctx, arg_MVN *a) {
-    TCGv res = tcg_temp_new_i32();
-    gen_logic_op(ctx, tcg_constant_i32(0xFFFF), load_reg(ctx, a->rm), res, LOGIC_XOR);
-    store_reg(ctx, a->rd, res);
+    gen_logic_op(ctx, tcg_constant_i32(0xFFFF), load_reg(ctx, a->rm), a->rd, LOGIC_XOR);
     return true;
 }
 
