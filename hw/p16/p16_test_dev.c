@@ -60,7 +60,7 @@ static const MemoryRegionOps p16_test_mmio_ops = {
     .endianness = DEVICE_LITTLE_ENDIAN,
     .valid = {
         .min_access_size = 1,
-        .max_access_size = 4,
+        .max_access_size = 2,
     },
 };
 
