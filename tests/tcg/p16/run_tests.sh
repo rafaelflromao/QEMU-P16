@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=~/qemu/buildDir/qemu-system-p16
+QEMU=qemu-system-p16
 
 # 1. Initialize counters
 PASS=0
@@ -27,8 +27,8 @@ for test_file in */*.S; do
     
     TOTAL=$((TOTAL+1))
     
-#    rm -f *.o *.elf
 done
+rm *.elf *.o
 
 # 2. Print Final Summary
 echo ""
