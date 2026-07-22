@@ -10,10 +10,8 @@ _start:
     MOV R2, #5
     CMP R1, R2
     BLO _branch_taken
-    B _fail
-_branch_taken:
-
-    TEST_EXIT_PASS
-
-_fail:
+    
     TEST_EXIT_FAIL
+    
+_branch_taken:
+    TEST_EXIT_PASS

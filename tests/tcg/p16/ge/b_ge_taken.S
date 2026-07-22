@@ -10,10 +10,8 @@ _start:
     MOV R2, #3
     CMP R1, R2
     BGE _branch_taken
-    B _fail
-_branch_taken:
-
-    TEST_EXIT_PASS
-
-_fail:
+    
     TEST_EXIT_FAIL
+    
+_branch_taken:
+    TEST_EXIT_PASS

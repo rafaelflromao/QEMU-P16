@@ -6,10 +6,9 @@ _start:
 
     /* BRANCH TEST: B (Unconditional) */
     B _target
-    B _fail
-_target:
-
-    TEST_EXIT_PASS
-
-_fail:
+    
+    /* If we reach here, the branch was not taken, which is a failure. */
     TEST_EXIT_FAIL
+
+_target:
+    TEST_EXIT_PASS
