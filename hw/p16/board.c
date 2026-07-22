@@ -26,6 +26,7 @@
 #include "hw/core/qdev-properties.h"
 #include "hw/core/sysbus.h"
 #include "boot.h"
+#include "qemu/units.h"
 
 /* --- Machine State Definition --- */
 
@@ -38,9 +39,11 @@ struct P16MachineState {
     MachineState parent_obj;
     P16CPU *cpu;
 };
+
 typedef struct P16MachineState P16MachineState;
 
 #define TYPE_P16_MACHINE MACHINE_TYPE_NAME("p16-generic")
+#define TYPE_P16_TEST_MACHINE MACHINE_TYPE_NAME("p16-testboard")
 DECLARE_INSTANCE_CHECKER(P16MachineState, P16_MACHINE, TYPE_P16_MACHINE)
 
 
@@ -54,8 +57,7 @@ DECLARE_INSTANCE_CHECKER(P16MachineState, P16_MACHINE, TYPE_P16_MACHINE)
  * design, meaning it relies heavily on a Device Tree Blob (DTB) to map
  * memory and peripherals, rather than hardcoding addresses in C.
  */
-static void p16_machine_init(MachineState *machine)
-{
+static void p16_machine_base_init(MachineState *machine) {
     P16MachineState *s = P16_MACHINE(machine);
     MemoryRegion *sysmem = get_system_memory();
     MemoryRegion *ram = g_new(MemoryRegion, 1);
@@ -91,6 +93,15 @@ static void p16_machine_init(MachineState *machine)
     }
 }
 
+static void p16_machine_test_init(MachineState *machine) {
+    p16_machine_base_init(machine);
+
+    DeviceState *test_dev = qdev_new("p16-test");
+    sysbus_realize_and_unref(SYS_BUS_DEVICE(test_dev), &error_fatal);
+
+    sysbus_mmio_map(SYS_BUS_DEVICE(test_dev), 0, 0xFF00);
+}
+
 
 /* --- QOM Class Setup --- */
 
@@ -99,12 +110,11 @@ static void p16_machine_init(MachineState *machine)
  *
  * Defines the capabilities and restrictions of this specific board.
  */
-static void p16_machine_class_init(ObjectClass *oc, const void *data)
-{
+static void p16_machine_class_init(ObjectClass *oc, const void *data) {
     MachineClass *mc = MACHINE_CLASS(oc);
 
-    mc->desc = "Generic P16 FDT-driven Board";
-    mc->init = p16_machine_init;
+    mc->desc = "Generic P16 Board";
+    mc->init = p16_machine_base_init;
     mc->default_cpu_type = TYPE_P16_CPU;
 
     /* Hardware restrictions for this microcontroller board */
@@ -113,23 +123,35 @@ static void p16_machine_class_init(ObjectClass *oc, const void *data)
     mc->no_cdrom = 1;
     mc->no_parallel = 1;
 
-    /* Memory size is dictated by the FDT or discrete p16-mem devices */
-    mc->default_ram_size = 0;
+    /* Default 32 KiB Memory Size */
+    mc->default_ram_size = 32 * KiB;
 
-    /* Allow the user/FDT to dynamically spawn custom memory controllers */
-    machine_class_allow_dynamic_sysbus_dev(mc, "p16-mem");
 }
 
-static const TypeInfo p16_machine_type = {
-    .name          = TYPE_P16_MACHINE,
-    .parent        = TYPE_MACHINE,
-    .instance_size = sizeof(P16MachineState),
-    .class_init    = p16_machine_class_init,
+/**
+ * p16_testboard_machine_class_init:
+ *
+ * Defines the capabilities and restrictions of this specific board.
+ */
+static void p16_testboard_machine_class_init(ObjectClass *oc, const void *data) {
+    MachineClass *mc = MACHINE_CLASS(oc);
+
+    mc->desc = "P16 Testboard";
+    mc->init = p16_machine_test_init;
+}
+
+static const TypeInfo p16_machine_types[] = {
+    {
+        .name = TYPE_P16_MACHINE,
+        .parent = TYPE_MACHINE,
+        .instance_size = sizeof(P16MachineState),
+        .class_init = p16_machine_class_init,
+    },
+    {
+        .name = TYPE_P16_TEST_MACHINE,
+        .parent = TYPE_P16_MACHINE,
+        .class_init = p16_testboard_machine_class_init,
+    },
 };
 
-static void p16_machine_register_types(void)
-{
-    type_register_static(&p16_machine_type);
-}
-
-type_init(p16_machine_register_types)
+DEFINE_TYPES(p16_machine_types)

@@ -1,0 +1,52 @@
+#
+# p16 system tests (SoftMMU Bare-Metal Environment)
+#
+
+P16_SRC = $(SRC_PATH)/tests/tcg/p16
+
+# Find all .S files generated in the subdirectories (e.g., ldr/, str/, add/, eq/)
+P16_ALL_SRC = $(wildcard $(P16_SRC)/*/*.S)
+
+# The final target for QEMU to test will be the filename with the .tst extension
+P16_TESTS = $(notdir $(P16_ALL_SRC:.S=.tst))
+
+# Filter out auxiliary files or known broken tests that you want to ignore for now
+# Example: P16_BROKEN_TESTS = mem_ldr_ind_zero.tst
+P16_BROKEN_TESTS =
+P16_USABLE_TESTS = $(filter-out $(P16_BROKEN_TESTS), $(P16_TESTS))
+
+# Add to the official QEMU system test list
+TESTS += $(P16_USABLE_TESTS)
+
+# VPATH allows Make to automatically find the .S files in their respective subdirectories
+VPATH += $(sort $(dir $(P16_ALL_SRC)))
+
+# Architecture-specific toolchain
+AS = p16-none-elf-as
+LD = p16-none-elf-ld
+
+# Assembler and Linker flags (-I ensures it can find macros.inc in the root test folder)
+ASFLAGS = -g -I$(P16_SRC)
+LDFLAGS = -g
+
+# QEMU SoftMMU hardware initialization options
+QEMU_OPTS += -machine p16-testboard -monitor none -display none -bios
+
+# ==============================================================================
+# BUILD RULES (SoftMMU specific)
+# ==============================================================================
+
+# Dependencies: recompile all tests if macros.inc changes
+$(P16_USABLE_TESTS): macros.inc
+
+# Rule: Assemble source (.S) into object file (.o)
+%.o: %.S
+	$(AS) $(ASFLAGS) $< -o $@
+
+# Rule: Link object file (.o) into the final test executable (.tst)
+%.tst: %.o
+	$(LD) $(LDFLAGS) $< -o $@
+
+# ==============================================================================
+# Disable default multi-architecture tests (not applicable to custom softmmu boards)
+undefine MULTIARCH_TESTS

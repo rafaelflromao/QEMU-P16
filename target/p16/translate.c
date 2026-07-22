@@ -573,7 +573,7 @@ static bool trans_MRS_S(DisasContext *ctx, arg_MRS_S *a) {
 static bool trans_MSR_C(DisasContext *ctx, arg_MSR_C *a) {
     TCGv_i32 tmp = tcg_temp_new_i32();
     tcg_gen_andi_i32(tmp, load_reg(ctx, a->rm), 0x003F);
-    gen_helper_set_cpsr(tcg_env, cpu_spsr);
+    gen_helper_set_cpsr(tcg_env, tmp);
     ctx->base.is_jmp = DISAS_UPDATE;
     return true;
 }
